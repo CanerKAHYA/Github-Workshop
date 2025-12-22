@@ -146,6 +146,7 @@ console.log('%c👉 https://github.com/Furk4nBulut/Github-Workshop', 'font-size:
 function initTheme() {
     const themeToggle = document.getElementById('themeToggle');
     const html = document.documentElement;
+    const highlightTheme = document.getElementById('highlight-theme');
 
     // Check local storage or system preference
     const savedTheme = localStorage.getItem('theme');
@@ -154,6 +155,7 @@ function initTheme() {
     let currentTheme = savedTheme || systemTheme;
     html.setAttribute('data-theme', currentTheme);
     updateThemeIcon(currentTheme);
+    updateHighlightTheme(highlightTheme, currentTheme);
 
     if (themeToggle) {
         themeToggle.addEventListener('click', () => {
@@ -161,8 +163,15 @@ function initTheme() {
             html.setAttribute('data-theme', currentTheme);
             localStorage.setItem('theme', currentTheme);
             updateThemeIcon(currentTheme);
+            updateHighlightTheme(highlightTheme, currentTheme);
         });
     }
+}
+
+function updateHighlightTheme(linkElement, theme) {
+    if (!linkElement) return;
+    const newTheme = theme === 'dark' ? 'github-dark' : 'github';
+    linkElement.href = `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/${newTheme}.min.css`;
 }
 
 function updateThemeIcon(theme) {

@@ -19,6 +19,10 @@
 
     --gradient-primary: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #d946ef 100%);
     --gradient-hero: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0a0a0f 100%);
+
+    --bg-navbar: rgba(10, 10, 15, 0.85);
+    --bg-navbar-scrolled: rgba(10, 10, 15, 0.95);
+    --bg-window-header: rgba(0, 0, 0, 0.3);
 }
 
 /* Light Mode Overrides */
@@ -35,6 +39,10 @@
     --border-light: #cbd5e1;
 
     --gradient-hero: linear-gradient(135deg, #f8fafc 0%, #eef2ff 50%, #f8fafc 100%);
+
+    --bg-navbar: rgba(255, 255, 255, 0.85);
+    --bg-navbar-scrolled: rgba(255, 255, 255, 0.95);
+    --bg-window-header: rgba(0, 0, 0, 0.05);
 }
 
 .nav-btn-icon {
@@ -96,7 +104,7 @@ body {
     left: 0;
     right: 0;
     height: 70px;
-    background: rgba(10, 10, 15, 0.85);
+    background: var(--bg-navbar);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border);
     z-index: 1000;
@@ -104,7 +112,7 @@ body {
 }
 
 .navbar.scrolled {
-    background: rgba(10, 10, 15, 0.95);
+    background: var(--bg-navbar-scrolled);
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
 }
 
@@ -389,7 +397,7 @@ body {
     align-items: center;
     gap: 8px;
     padding: 14px 16px;
-    background: rgba(0, 0, 0, 0.3);
+    background: var(--bg-window-header);
     border-bottom: 1px solid var(--border);
 }
 
