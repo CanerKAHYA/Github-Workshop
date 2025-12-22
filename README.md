@@ -40,6 +40,7 @@
 ## 📌 İçindekiler
 
 - [🎯 Eğitim Hakkında](#-eğitim-hakkında)
+- [📋 Yoklama](#-yoklama)
 - [🚀 Hızlı Başlangıç](#-hızlı-başlangıç)
 - [📚 Müfredat](#-müfredat)
 - [📊 Eğitim İstatistikleri](#-eğitim-istatistikleri)
@@ -80,7 +81,32 @@ Bu workshop, **Git** ve **GitHub**'ı hiç bilmeyenlerden başlayarak, profesyon
 
 ---
 
-## 🚀 Hızlı Başlangıç
+## � Yoklama
+
+> **Workshop'a katılım için aşağıdaki adımları takip edin!**
+
+### 📝 Yoklama Nasıl Alınır?
+
+1. 🍴 Bu repoyu **fork** edin
+2. 📧 `ATTENDANCE.md` dosyasına öğrenci e-postanızı ekleyin
+3. 🔀 **Pull Request** açın
+4. ✅ GitHub Actions otomatik olarak e-posta formatınızı doğrulayacak
+5. 🎉 Doğrulama başarılı olursa PR merge edilecek
+
+### ✉️ E-posta Formatı
+
+```
+ogrenci_no@ogr.cbu.edu.tr
+```
+
+**Örnek:** `210316011@ogr.cbu.edu.tr`
+
+> [!TIP]
+> [📋 Katılımcı Listesi](ATTENDANCE.md) dosyasına göz atarak kimlerin katıldığını görebilirsiniz!
+
+---
+
+## �🚀 Hızlı Başlangıç
 
 ### Adım 1: Git Kurulumu
 

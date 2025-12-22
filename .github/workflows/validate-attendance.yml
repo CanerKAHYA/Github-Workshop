@@ -1,0 +1,121 @@
+# Yoklama PR'larını Doğrulama Workflow'u
+name: Validate Attendance PR
+
+on:
+  pull_request:
+    paths:
+      - 'ATTENDANCE.md'
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  validate-email:
+    name: 📧 E-posta Format Kontrolü
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔍 E-posta Formatını Doğrula
+        id: validate
+        run: |
+          echo "🔍 ATTENDANCE.md değişiklikleri kontrol ediliyor..."
+          
+          # PR'daki değişiklikleri al (sadece eklenen satırlar)
+          ADDED_LINES=$(git diff origin/${{ github.base_ref }}...HEAD -- ATTENDANCE.md | grep "^+" | grep -v "^+++" | sed 's/^+//')
+          
+          echo "📝 Eklenen satırlar:"
+          echo "$ADDED_LINES"
+          
+          # E-posta regex pattern - @ işaretinden sonrasını kabul eder
+          EMAIL_PATTERN='^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+          
+          VALID=true
+          INVALID_EMAILS=""
+          VALID_EMAILS=""
+          
+          while IFS= read -r line; do
+            # Boş satırları ve yorum satırlarını atla
+            if [[ -z "$line" ]] || [[ "$line" =~ ^[[:space:]]*$ ]] || [[ "$line" =~ ^# ]] || [[ "$line" =~ ^\<\!-- ]] || [[ "$line" =~ ^\` ]]; then
+              continue
+            fi
+            
+            # Sadece e-posta içeren satırları kontrol et
+            TRIMMED=$(echo "$line" | xargs)
+            
+            if [[ "$TRIMMED" =~ $EMAIL_PATTERN ]]; then
+              VALID_EMAILS="$VALID_EMAILS\n✅ $TRIMMED"
+              echo "✅ Geçerli e-posta: $TRIMMED"
+            else
+              # Eğer satır bir e-posta gibi görünüyorsa (@ içeriyorsa) ama format yanlışsa
+              if [[ "$TRIMMED" == *"@"* ]]; then
+                VALID=false
+                INVALID_EMAILS="$INVALID_EMAILS\n❌ $TRIMMED"
+                echo "❌ Geçersiz e-posta formatı: $TRIMMED"
+              fi
+            fi
+          done <<< "$ADDED_LINES"
+          
+          if [ "$VALID" = true ]; then
+            echo "valid=true" >> $GITHUB_OUTPUT
+            echo "valid_emails=$VALID_EMAILS" >> $GITHUB_OUTPUT
+            echo ""
+            echo "🎉 Tüm e-postalar geçerli formatta!"
+          else
+            echo "valid=false" >> $GITHUB_OUTPUT
+            echo "invalid_emails=$INVALID_EMAILS" >> $GITHUB_OUTPUT
+            echo ""
+            echo "⚠️ Bazı e-postalar geçersiz formatta!"
+          fi
+
+      - name: ✅ Başarılı - Yorum Ekle
+        if: steps.validate.outputs.valid == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## ✅ Yoklama Doğrulaması Başarılı!
+
+            E-posta formatınız geçerli. PR merge edilmeye hazır! 🎉
+
+            ---
+            *Bu otomatik bir mesajdır. GitHub Actions tarafından oluşturulmuştur.*`
+            })
+
+      - name: ❌ Başarısız - Yorum Ekle
+        if: steps.validate.outputs.valid == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## ❌ Yoklama Doğrulaması Başarısız
+
+            E-posta formatınız geçersiz. Lütfen aşağıdaki formata uygun şekilde düzeltin:
+
+            \`\`\`
+            ogrenci_no@ogr.cbu.edu.tr
+            \`\`\`
+
+            **Örnek:** \`210316011@ogr.cbu.edu.tr\`
+
+            ---
+            *Bu otomatik bir mesajdır. GitHub Actions tarafından oluşturulmuştur.*`
+            })
+
+      - name: 🚫 Geçersiz Format İçin Workflow'u Başarısız Yap
+        if: steps.validate.outputs.valid == 'false'
+        run: |
+          echo "❌ E-posta format doğrulaması başarısız!"
+          exit 1
